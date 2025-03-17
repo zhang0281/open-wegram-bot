@@ -90,15 +90,15 @@ export async function handleWebhook(request, ownerUid, botToken, secretToken) {
         if (reply && message.chat.id.toString() === ownerUid) {
             const rm = reply.reply_markup;
             if (rm && rm.inline_keyboard && rm.inline_keyboard.length > 0) {
+                let senderUid = rm.inline_keyboard[0][0].callback_data;
+                if (!senderUid) {
+                    senderUid = rm.inline_keyboard[0][0].url.split('tg://user?id=')[1];
+                }
+
                 await postToTelegramApi(botToken, 'copyMessage', {
-                    chat_id: parseInt(rm.inline_keyboard[0][0].callback_data),
+                    chat_id: parseInt(senderUid),
                     from_chat_id: message.chat.id,
                     message_id: message.message_id
-                });
-            } else {
-                await postToTelegramApi(botToken, 'sendMessage', {
-                    chat_id: message.chat.id,
-                    text: "Cannot find the original message"
                 });
             }
 
