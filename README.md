@@ -115,7 +115,7 @@ Vercel 部署的优点是简单快速，支持自动更新，并且默认提供 
 1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)
 2. 导航到 **Workers & Pages** 页面
 3. 点击 **Create Worker**
-4. 删除默认代码，粘贴本项目的 `src/worker.js` 代码
+4. 删除默认代码，粘贴本项目的 `src/worker.js` 和 `src/core.js` 代码
 5. 点击 **Save and Deploy**
 6. 在 Worker 设置中添加环境变量：
    - `PREFIX`（例如：`public`）

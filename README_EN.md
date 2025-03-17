@@ -114,7 +114,7 @@ If you prefer not to use GitHub or command-line tools, you can create the Worker
 1. Log in to the [Cloudflare Dashboard](https://dash.cloudflare.com/)
 2. Navigate to the **Workers & Pages** section
 3. Click **Create Worker**
-4. Delete the default code and paste the code from this project's `src/worker.js`
+4. Delete the default code and paste the code from this project's `src/worker.js` and `src/core.js`
 5. Click **Save and Deploy**
 6. Add environment variables in the Worker settings:
    - `PREFIX` (e.g., `public`)
