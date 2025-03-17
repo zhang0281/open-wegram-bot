@@ -4,16 +4,3 @@ compatibility_date = "2023-05-18"
 
 [placement]
 mode = "smart"
-
-# Specify environment variables for your main production environment
-[vars]
-PREFIX = "public"
-# SECRET_TOKEN will be configured via Cloudflare Dashboard
-
-# Define a staging environment for testing
-[env.staging]
-name = "open-wegram-bot-staging"
-
-[env.staging.vars]
-PREFIX = "staging"
-# SECRET_TOKEN will be configured via Cloudflare Dashboard
