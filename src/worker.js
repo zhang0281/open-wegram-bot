@@ -1,11 +1,42 @@
-const CONFIG = {
-    prefix: 'public', // change me
-    secretToken: '' // change me
-};
+/**
+ * Open Wegram Bot - Cloudflare Worker
+ * A two-way private messaging Telegram bot
+ *
+ * GitHub Repository: https://github.com/wozulong/open-wegram-bot
+ *
+ * Deploy options:
+ * 1. GitHub integration (recommended): Connect this repository to Cloudflare
+ * 2. Wrangler CLI: Use 'npx wrangler deploy'
+ */
 
-const INSTALL_PATTERN = new RegExp(`^/${CONFIG.prefix}/install/([^/]+)/([^/]+)$`);
-const UNINSTALL_PATTERN = new RegExp(`^/${CONFIG.prefix}/uninstall/([^/]+)$`);
-const WEBHOOK_PATTERN = new RegExp(`^/${CONFIG.prefix}/webhook/([^/]+)/([^/]+)$`);
+export default {
+    async fetch(request, env, ctx) {
+        const url = new URL(request.url);
+        const path = url.pathname;
+
+        const PREFIX = env.PREFIX || 'public';
+        const SECRET_TOKEN = env.SECRET_TOKEN || '';
+
+        const INSTALL_PATTERN = new RegExp(`^/${PREFIX}/install/([^/]+)/([^/]+)$`);
+        const UNINSTALL_PATTERN = new RegExp(`^/${PREFIX}/uninstall/([^/]+)$`);
+        const WEBHOOK_PATTERN = new RegExp(`^/${PREFIX}/webhook/([^/]+)/([^/]+)$`);
+
+        let match;
+        if (match = path.match(INSTALL_PATTERN)) {
+            return handleInstall(request, match[1], match[2], PREFIX, SECRET_TOKEN);
+        }
+
+        if (match = path.match(UNINSTALL_PATTERN)) {
+            return handleUninstall(match[1], SECRET_TOKEN);
+        }
+
+        if (match = path.match(WEBHOOK_PATTERN)) {
+            return handleWebhook(request, match[1], match[2], SECRET_TOKEN);
+        }
+
+        return new Response('Not Found', {status: 404});
+    }
+};
 
 function validateSecretToken(token) {
     return token.length > 15 && /[A-Z]/.test(token) && /[a-z]/.test(token) && /[0-9]/.test(token);
@@ -23,8 +54,8 @@ async function postToTelegramApi(token, method, body) {
     });
 }
 
-async function handleInstall(request, ownerUid, botToken) {
-    if (!validateSecretToken(CONFIG.secretToken)) {
+async function handleInstall(request, ownerUid, botToken, prefix, secretToken) {
+    if (!validateSecretToken(secretToken)) {
         return jsonResponse({
             success: false,
             message: 'Secret token must be at least 16 characters and contain uppercase letters, lowercase letters, and numbers.'
@@ -33,13 +64,13 @@ async function handleInstall(request, ownerUid, botToken) {
 
     const url = new URL(request.url);
     const baseUrl = `${url.protocol}//${url.hostname}`;
-    const webhookUrl = `${baseUrl}/${CONFIG.prefix}/webhook/${ownerUid}/${botToken}`;
+    const webhookUrl = `${baseUrl}/${prefix}/webhook/${ownerUid}/${botToken}`;
 
     try {
         const response = await postToTelegramApi(botToken, 'setWebhook', {
             url: webhookUrl,
             allowed_updates: ['message'],
-            secret_token: CONFIG.secretToken
+            secret_token: secretToken
         });
 
         const result = await response.json();
@@ -53,8 +84,8 @@ async function handleInstall(request, ownerUid, botToken) {
     }
 }
 
-async function handleUninstall(botToken) {
-    if (!validateSecretToken(CONFIG.secretToken)) {
+async function handleUninstall(botToken, secretToken) {
+    if (!validateSecretToken(secretToken)) {
         return jsonResponse({
             success: false,
             message: 'Secret token must be at least 16 characters and contain uppercase letters, lowercase letters, and numbers.'
@@ -75,8 +106,8 @@ async function handleUninstall(botToken) {
     }
 }
 
-async function handleWebhook(request, ownerUid, botToken) {
-    if (CONFIG.secretToken !== request.headers.get('X-Telegram-Bot-Api-Secret-Token')) {
+async function handleWebhook(request, ownerUid, botToken, secretToken) {
+    if (secretToken !== request.headers.get('X-Telegram-Bot-Api-Secret-Token')) {
         return new Response('Unauthorized', {status: 401});
     }
 
@@ -139,25 +170,3 @@ async function handleWebhook(request, ownerUid, botToken) {
         return new Response('Internal Server Error', {status: 500});
     }
 }
-
-export default {
-    async fetch(request, env, ctx) {
-        const url = new URL(request.url);
-        const path = url.pathname;
-
-        let match;
-        if (match = path.match(INSTALL_PATTERN)) {
-            return handleInstall(request, match[1], match[2]);
-        }
-
-        if (match = path.match(UNINSTALL_PATTERN)) {
-            return handleUninstall(match[1]);
-        }
-
-        if (match = path.match(WEBHOOK_PATTERN)) {
-            return handleWebhook(request, match[1], match[2]);
-        }
-
-        return new Response('Not Found', {status: 404});
-    }
-};

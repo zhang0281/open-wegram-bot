@@ -16,6 +16,7 @@ Users can send messages to you through your bot, and you can reply directly to t
 - 💰 **Zero Running Cost** - Operates within Cloudflare's free plan limits
 - 🔒 **Secure and Reliable** - Uses official Telegram API and secure tokens
 - 🔌 **Multiple Bot Support** - Register multiple private chat bots with a single deployment
+- 🛠️ **Multiple Deployment Options** - GitHub one-click deploy, Wrangler CLI, and Dashboard deployment
 
 ## 🛠️ Prerequisites
 
@@ -43,26 +44,69 @@ Note down your numeric ID (e.g., `123456789`).
 4. Upon success, BotFather will send you a Bot API Token (format similar to: `000000000:ABCDEFGhijklmnopqrstuvwxyz`)
 5. Securely save this Bot API Token
 
-### 3. Deploy Cloudflare Worker
+### 3. Choose a Deployment Method
 
-1. Log into the [Cloudflare Dashboard](https://dash.cloudflare.com/)
-2. Navigate to the `Workers & Pages` page
-3. Click `Create Worker` to create a new Worker
-4. Give your Worker a name (e.g., `open-wegram-bot`)
-5. Delete the default code and paste the code from this project's `worker.js`
-6. Modify the parameters in the `CONFIG` object at the beginning of the code:
+#### Method 1: GitHub One-Click Deployment (Recommended ⭐)
 
-```js
-const CONFIG = {
-    prefix: 'public',  // Custom URL prefix to prevent unauthorized use of your service
-    secretToken: 'Replace with your own security token'  // Must contain uppercase letters, lowercase letters, and numbers, at least 16 characters long
-};
-```
+This is the simplest deployment method, requiring no local development environment.
 
-> [!IMPORTANT]
-> The `prefix` parameter serves as part of the URL path to prevent unauthorized use of your service. You can set it to any string, and only those who know this prefix can register/use your service. This way, you can safely share it with trusted friends without worrying about misuse.
+1. Fork or clone this repository to your GitHub account
+2. Log in to the [Cloudflare Dashboard](https://dash.cloudflare.com/)
+3. Navigate to the **Workers & Pages** section
+4. Click **Create Application**
+5. Select **Connect to Git**
+6. Authorize Cloudflare to access your GitHub and select your forked repository
+7. Configure deployment settings:
+    - **Project name**: Set your project name (e.g., `open-wegram-bot`)
+    - **Production branch**: Select your main branch (usually `master`)
+    - Keep other settings as default
+8. Configure environment variables:
+    - Click on **Environment Variables**
+    - Add `PREFIX` (e.g., `public`)
+    - Add `SECRET_TOKEN` (must contain uppercase and lowercase letters and numbers, at least 16 characters long), and mark it as **Encrypted**
+9. Click **Save and Deploy** to complete the deployment
 
-7. Click `Save and Deploy` to save and deploy
+The advantage of this method is that when you update your GitHub repository, Cloudflare will automatically redeploy your Worker.
+
+#### Method 2: Using Wrangler CLI
+
+If you're comfortable with command-line tools, you can use the Wrangler CLI for deployment.
+
+1. Ensure you have Node.js and npm installed
+2. Clone this repository:
+   ```bash
+   git clone https://github.com/wozulong/open-wegram-bot.git
+   cd open-wegram-bot
+   ```
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+4. Log in to Cloudflare:
+   ```bash
+   npx wrangler login
+   ```
+5. Deploy the Worker:
+   ```bash
+   npm run deploy
+   ```
+6. Set your Secret Token:
+   ```bash
+   npx wrangler secret put SECRET_TOKEN
+   ```
+
+#### Method 3: Manual Deployment via Cloudflare Dashboard
+
+If you prefer not to use GitHub or command-line tools, you can create the Worker directly in the Cloudflare Dashboard.
+
+1. Log in to the [Cloudflare Dashboard](https://dash.cloudflare.com/)
+2. Navigate to the **Workers & Pages** section
+3. Click **Create Worker**
+4. Delete the default code and paste the code from this project's `src/worker.js`
+5. Click **Save and Deploy**
+6. Add environment variables in the Worker settings:
+    - `PREFIX` (e.g., `public`)
+    - `SECRET_TOKEN` (must contain uppercase and lowercase letters and numbers, at least 16 characters long)
 
 ### 3.1 (Optional) Bind a Custom Domain 🌐
 
@@ -71,7 +115,10 @@ const CONFIG = {
 
 Cloudflare allows you to bind your own domain to your Worker, enabling you to access the Worker through your domain.
 
-If you plan to offer your bot as a public service or want more convenient bot management, setting up a custom domain is recommended.
+1. In your Cloudflare dashboard, add your domain
+2. In the Workers & Pages section, select your worker
+3. Click on **Triggers** and then **Add Custom Domain**
+4. Follow the instructions to bind your domain
 
 After binding, you can use addresses like `https://your-domain.com/YOUR_PREFIX/install/...` to register/uninstall bots.
 
@@ -84,18 +131,12 @@ Now you need to register your Bot:
 1. Visit the following URL in your browser to register your Bot (replace the parameters accordingly):
 
 ```
-https://your-worker-name.your-subdomain.workers.dev/YOUR_PREFIX/install/YOUR_TELEGRAM_UID/BOT_API_TOKEN
-```
-
-Or if you've bound a custom domain:
-
-```
-https://your-domain.com/YOUR_PREFIX/install/YOUR_TELEGRAM_UID/BOT_API_TOKEN
+https://your-worker-url/YOUR_PREFIX/install/YOUR_TELEGRAM_UID/BOT_API_TOKEN
 ```
 
 For example:
 ```
-https://telegram-private-msg.username.workers.dev/public/install/123456789/000000000:ABCDEFGhijklmnopqrstuvwxyz
+https://open-wegram-bot.username.workers.dev/public/install/123456789/000000000:ABCDEFGhijklmnopqrstuvwxyz
 ```
 
 2. If you see a success message, your Bot has been successfully registered
@@ -121,13 +162,7 @@ To reply to a user's message:
 If you want to uninstall the Bot, visit the following URL (replace with your parameters):
 
 ```
-https://your-worker-name.your-subdomain.workers.dev/YOUR_PREFIX/uninstall/BOT_API_TOKEN
-```
-
-Or if you're using a custom domain:
-
-```
-https://your-domain.com/YOUR_PREFIX/uninstall/BOT_API_TOKEN
+https://your-worker-url/YOUR_PREFIX/uninstall/BOT_API_TOKEN
 ```
 
 ## 🔒 Security Notes
@@ -156,7 +191,9 @@ If you anticipate higher usage, consider upgrading to Cloudflare's paid plan.
 - **Messages not forwarded**: Ensure the Bot is correctly registered and check the Worker logs
 - **Cannot access registration URL**: Try using a custom domain to solve access issues
 - **Reply message fails**: Check if you're correctly using Telegram's reply function
-- **Registration fails**: Ensure your `secretToken` meets the requirements (contains uppercase and lowercase letters and numbers, at least 16 characters long)
+- **Registration fails**: Ensure your `SECRET_TOKEN` meets the requirements (contains uppercase and lowercase letters and numbers, at least 16 characters long)
+- **GitHub deployment fails**: Check if your environment variables are correctly set and repository permissions are correct
+- **Worker deployment fails**: Check your Wrangler configuration and ensure you're logged in to Cloudflare
 
 ## 🤝 Contributions and Contact
 

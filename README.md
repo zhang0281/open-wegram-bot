@@ -16,6 +16,7 @@
 - 💰 **零成本运行** - 在 Cloudflare 免费计划范围内使用
 - 🔒 **安全可靠** - 使用 Telegram 官方 API 和安全令牌
 - 🔌 **多机器人支持** - 一个部署可注册多个私聊机器人
+- 🛠️ **多种部署方式** - 支持 GitHub 一键部署、Wrangler CLI 和 Dashboard 部署
 
 ## 🛠️ 前置要求
 
@@ -44,26 +45,65 @@
 4. 成功后，BotFather 会发给您一个 Bot API Token（格式类似：`000000000:ABCDEFGhijklmnopqrstuvwxyz`）
 5. 请安全保存这个 Bot API Token
 
-### 3. 部署 Cloudflare Worker
+### 3. 选择部署方式
+
+#### 方法一：GitHub 一键部署（推荐 ⭐）
+
+这是最简单的部署方式，无需本地开发环境，直接通过 GitHub 仓库部署。
+
+1. Fork 或克隆本仓库到您的 GitHub 账户
+2. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)
+3. 导航到 **Workers & Pages** 部分
+4. 点击 **Create Application**
+5. 选择 **Connect to Git**
+6. 授权 Cloudflare 访问您的 GitHub，并选择您 fork 的仓库
+7. 配置部署设置：
+    - **Project name**：设置您的项目名称（例如 `open-wegram-bot`）
+    - **Production branch**：选择主分支（通常是 `master`）
+    - 其他设置保持默认
+8. 配置环境变量：
+    - 点击 **Environment Variables**
+    - 添加 `PREFIX`（例如：`public`）
+    - 添加 `SECRET_TOKEN`（必须包含大小写字母和数字，长度至少16位），并标记为**加密**
+9. 点击 **Save and Deploy** 按钮完成部署
+
+这种方式的优点是：当您更新 GitHub 仓库时，Cloudflare 会自动重新部署您的 Worker。
+
+#### 方法二：使用 Wrangler CLI
+
+如果您熟悉命令行工具，可以使用 Wrangler CLI 进行部署。
+
+1. 确保安装了 Node.js 和 npm
+2. 克隆本仓库：
+   ```bash
+   git clone https://github.com/wozulong/open-wegram-bot.git
+   cd open-wegram-bot
+   ```
+3. 安装依赖：
+   ```bash
+   npm install
+   ```
+4. 部署 Worker：
+   ```bash
+   npx wrangler deploy
+   ```
+5. 设置您的安全令牌：
+   ```bash
+   npx wrangler secret put SECRET_TOKEN
+   ```
+
+#### 方法三：通过 Cloudflare Dashboard 手动部署
+
+如果您不想使用 GitHub 或命令行，也可以直接在 Cloudflare Dashboard 中创建。
 
 1. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)
-2. 导航到 `Workers & Pages` 页面
-3. 点击 `Create Worker` 创建新的 Worker
-4. 为您的 Worker 取一个名称（例如：`open-wegram-bot`）
-5. 删除默认代码，将本项目的代码 `worker.js` 粘贴进去
-6. 在代码开头的 `CONFIG` 对象中修改参数：
-
-```js
-const CONFIG = {
-    prefix: 'public',  // 自定义URL前缀，用于防止他人随意使用您的服务
-    secretToken: '请替换为您自己的安全令牌'  // 必须包含大写字母、小写字母和数字，长度至少16位
-};
-```
-
-> [!IMPORTANT]
-> `prefix` 参数作为URL路径的一部分，可以防止他人随意使用您的服务。您可以将其设置为任何字符串，只有知道这个前缀的人才能注册/使用您的服务。这样您可以安全地分享给信任的朋友，而不必担心被滥用。
-
-7. 点击 `Save and Deploy` 保存并部署
+2. 导航到 **Workers & Pages** 页面
+3. 点击 **Create Worker**
+4. 删除默认代码，粘贴本项目的 `src/worker.js` 代码
+5. 点击 **Save and Deploy**
+6. 在 Worker 设置中添加环境变量：
+    - `PREFIX`（例如：`public`）
+    - `SECRET_TOKEN`（必须包含大小写字母和数字，长度至少16位）
 
 ### 3.1 (可选) 绑定自定义域名 🌐
 
@@ -72,7 +112,10 @@ const CONFIG = {
 
 Cloudflare 允许您将自己的域名绑定到 Worker 上，这样您就可以通过自己的域名访问 Worker，而不需要使用被和谐的默认域名。
 
-如果您打算将您的机器人作为公共服务提供，或者希望更方便地管理机器人，则建议配置自定义域名。
+1. 在 Cloudflare 仪表板中添加您的域名
+2. 在 Workers & Pages 部分，选择您的 worker
+3. 点击 **Triggers**，然后点击 **Add Custom Domain**
+4. 按照说明将您的域名绑定到 Worker
 
 绑定后，您可以使用类似 `https://your-domain.com/YOUR_PREFIX/install/...` 的地址来注册/卸载机器人，无需科学工具。
 
@@ -88,18 +131,12 @@ Cloudflare 允许您将自己的域名绑定到 Worker 上，这样您就可以�
 1. 在浏览器中访问以下 URL 来注册您的 Bot（替换相应参数）：
 
 ```
-https://your-worker-name.your-subdomain.workers.dev/YOUR_PREFIX/install/YOUR_TELEGRAM_UID/BOT_API_TOKEN
-```
-
-或者如果您绑定了自定义域名：
-
-```
-https://your-domain.com/YOUR_PREFIX/install/YOUR_TELEGRAM_UID/BOT_API_TOKEN
+https://your-worker-url/YOUR_PREFIX/install/YOUR_TELEGRAM_UID/BOT_API_TOKEN
 ```
 
 例如：
 ```
-https://telegram-private-msg.username.workers.dev/public/install/123456789/000000000:ABCDEFGhijklmnopqrstuvwxyz
+https://open-wegram-bot.username.workers.dev/public/install/123456789/000000000:ABCDEFGhijklmnopqrstuvwxyz
 ```
 
 2. 如果看到成功消息，说明您的 Bot 已经注册成功
@@ -125,13 +162,7 @@ https://telegram-private-msg.username.workers.dev/public/install/123456789/00000
 如果您想卸载 Bot，请访问以下 URL（替换相应参数）：
 
 ```
-https://your-worker-name.your-subdomain.workers.dev/YOUR_PREFIX/uninstall/BOT_API_TOKEN
-```
-
-或者如果您使用自定义域名：
-
-```
-https://your-domain.com/YOUR_PREFIX/uninstall/BOT_API_TOKEN
+https://your-worker-url/YOUR_PREFIX/uninstall/BOT_API_TOKEN
 ```
 
 ## 🔒 安全说明
@@ -160,7 +191,9 @@ https://your-domain.com/YOUR_PREFIX/uninstall/BOT_API_TOKEN
 - **消息未转发**: 确保 Bot 已正确注册，并检查 Worker 日志
 - **无法访问注册 URL**: 确认您是否相信科学，或者考虑绑定自定义域名解决访问问题
 - **回复消息失败**: 检查您是否正确使用 Telegram 的回复功能
-- **注册失败**: 确保您的 `secretToken` 符合要求（包含大小写字母和数字，长度至少16位）
+- **注册失败**: 确保您的 `SECRET_TOKEN` 符合要求（包含大小写字母和数字，长度至少16位）
+- **GitHub 部署失败**: 检查环境变量是否正确设置，仓库权限是否正确
+- **Worker 部署失败**: 检查 Wrangler 配置并确保您已登录到 Cloudflare
 
 ## 🤝 贡献与联系
 
