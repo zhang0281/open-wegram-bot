@@ -3,7 +3,7 @@
 
 [简体中文](README.md) | English
 
-This is a two-way private messaging Telegram bot based on Cloudflare Worker that can be easily deployed without requiring a server, database, or your own domain name.
+This is a two-way private messaging Telegram bot based on Cloudflare Worker / Vercel that can be easily deployed without requiring a server, database, or your own domain name.
 
 Users can send messages to you through your bot, and you can reply directly to these messages, enabling two-way communication.
 
