@@ -16,7 +16,7 @@
 - 💰 **零成本运行** - 在 Cloudflare 免费计划范围内使用
 - 🔒 **安全可靠** - 使用 Telegram 官方 API 和安全令牌
 - 🔌 **多机器人支持** - 一个部署可注册多个私聊机器人
-- 🛠️ **多种部署方式** - 支持 GitHub 一键部署、Wrangler CLI 和 Dashboard 部署
+- 🛠️ **多种部署方式** - 支持 GitHub 一键部署、Vercel 一键部署、Wrangler CLI 和 Dashboard 部署
 
 ## 🛠️ 前置要求
 
@@ -58,18 +58,34 @@
 5. 选择 **Connect to Git**
 6. 授权 Cloudflare 访问您的 GitHub，并选择您 fork 的仓库
 7. 配置部署设置：
-    - **Project name**：设置您的项目名称（例如 `open-wegram-bot`）
-    - **Production branch**：选择主分支（通常是 `master`）
-    - 其他设置保持默认
+   - **Project name**：设置您的项目名称（例如 `open-wegram-bot`）
+   - **Production branch**：选择主分支（通常是 `master`）
+   - 其他设置保持默认
 8. 配置环境变量：
-    - 点击 **Environment Variables**
-    - 添加 `PREFIX`（例如：`public`）
-    - 添加 `SECRET_TOKEN`（必须包含大小写字母和数字，长度至少16位），并标记为**加密**
+   - 点击 **Environment Variables**
+   - 添加 `PREFIX`（例如：`public`）
+   - 添加 `SECRET_TOKEN`（必须包含大小写字母和数字，长度至少16位），并标记为**加密**
 9. 点击 **Save and Deploy** 按钮完成部署
 
 这种方式的优点是：当您更新 GitHub 仓库时，Cloudflare 会自动重新部署您的 Worker。
 
-#### 方法二：使用 Wrangler CLI
+#### 方法二：Vercel 一键部署
+
+Vercel 提供了另一种简单的部署方式，也支持从 GitHub 仓库自动部署。
+
+1. 点击下方的"Deploy with Vercel"按钮：
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fwozulong%2Fopen-wegram-bot&env=SECRET_TOKEN,PREFIX&envDescription=配置您的机器人参数&project-name=open-wegram-bot&repository-name=open-wegram-bot)
+
+2. 按照 Vercel 的提示完成部署流程
+3. 配置环境变量：
+   - `PREFIX`：设置为您想要的 URL 前缀（例如 `public`）
+   - `SECRET_TOKEN`：设置一个安全的令牌（必须包含大小写字母和数字，长度至少16位）
+4. 完成部署后，Vercel 会提供一个域名，如 `your-project.vercel.app`
+
+Vercel 部署的优点是简单快速，支持自动更新，并且默认提供 HTTPS。
+
+#### 方法三：使用 Wrangler CLI
 
 如果您熟悉命令行工具，可以使用 Wrangler CLI 进行部署。
 
@@ -92,7 +108,7 @@
    npx wrangler secret put SECRET_TOKEN
    ```
 
-#### 方法三：通过 Cloudflare Dashboard 手动部署
+#### 方法四：通过 Cloudflare Dashboard 手动部署
 
 如果您不想使用 GitHub 或命令行，也可以直接在 Cloudflare Dashboard 中创建。
 
@@ -102,8 +118,8 @@
 4. 删除默认代码，粘贴本项目的 `src/worker.js` 代码
 5. 点击 **Save and Deploy**
 6. 在 Worker 设置中添加环境变量：
-    - `PREFIX`（例如：`public`）
-    - `SECRET_TOKEN`（必须包含大小写字母和数字，长度至少16位）
+   - `PREFIX`（例如：`public`）
+   - `SECRET_TOKEN`（必须包含大小写字母和数字，长度至少16位）
 
 ### 3.1 (可选) 绑定自定义域名 🌐
 
@@ -121,7 +137,10 @@ Cloudflare 允许您将自己的域名绑定到 Worker 上，这样您就可以�
 
 ### 4. 注册您的 Telegram Bot
 
-部署 Worker 后，您将获得一个形如 `https://your-worker-name.your-subdomain.workers.dev` 的 URL。
+部署 Worker 后，您将获得一个 URL，形如：
+- GitHub 集成：`https://your-project-name.username.workers.dev`
+- Vercel 部署：`https://your-project.vercel.app`
+- Wrangler/Dashboard：`https://your-worker-name.your-subdomain.workers.dev`
 
 现在您需要注册您的 Bot：
 

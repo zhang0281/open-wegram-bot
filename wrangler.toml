@@ -2,6 +2,9 @@ name = "open-wegram-bot"
 main = "src/worker.js"
 compatibility_date = "2023-05-18"
 
+[placement]
+mode = "smart"
+
 # Specify environment variables for your main production environment
 [vars]
 PREFIX = "public"

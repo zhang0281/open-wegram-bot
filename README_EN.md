@@ -16,7 +16,7 @@ Users can send messages to you through your bot, and you can reply directly to t
 - 💰 **Zero Running Cost** - Operates within Cloudflare's free plan limits
 - 🔒 **Secure and Reliable** - Uses official Telegram API and secure tokens
 - 🔌 **Multiple Bot Support** - Register multiple private chat bots with a single deployment
-- 🛠️ **Multiple Deployment Options** - GitHub one-click deploy, Wrangler CLI, and Dashboard deployment
+- 🛠️ **Multiple Deployment Options** - GitHub one-click deploy, Vercel one-click deploy, Wrangler CLI, and Dashboard deployment
 
 ## 🛠️ Prerequisites
 
@@ -57,18 +57,34 @@ This is the simplest deployment method, requiring no local development environme
 5. Select **Connect to Git**
 6. Authorize Cloudflare to access your GitHub and select your forked repository
 7. Configure deployment settings:
-    - **Project name**: Set your project name (e.g., `open-wegram-bot`)
-    - **Production branch**: Select your main branch (usually `master`)
-    - Keep other settings as default
+   - **Project name**: Set your project name (e.g., `open-wegram-bot`)
+   - **Production branch**: Select your main branch (usually `master`)
+   - Keep other settings as default
 8. Configure environment variables:
-    - Click on **Environment Variables**
-    - Add `PREFIX` (e.g., `public`)
-    - Add `SECRET_TOKEN` (must contain uppercase and lowercase letters and numbers, at least 16 characters long), and mark it as **Encrypted**
+   - Click on **Environment Variables**
+   - Add `PREFIX` (e.g., `public`)
+   - Add `SECRET_TOKEN` (must contain uppercase and lowercase letters and numbers, at least 16 characters long), and mark it as **Encrypted**
 9. Click **Save and Deploy** to complete the deployment
 
 The advantage of this method is that when you update your GitHub repository, Cloudflare will automatically redeploy your Worker.
 
-#### Method 2: Using Wrangler CLI
+#### Method 2: Vercel One-Click Deployment
+
+Vercel provides another simple deployment option, also supporting automatic deployments from GitHub.
+
+1. Click the "Deploy with Vercel" button below:
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fwozulong%2Fopen-wegram-bot&env=SECRET_TOKEN,PREFIX&envDescription=Configure%20your%20bot%20parameters&&project-name=open-wegram-bot&repository-name=open-wegram-bot)
+
+2. Follow Vercel's prompts to complete the deployment process
+3. Configure environment variables:
+   - `PREFIX`: Set to your desired URL prefix (e.g., `public`)
+   - `SECRET_TOKEN`: Set a secure token (must contain uppercase and lowercase letters and numbers, at least 16 characters long)
+4. After deployment, Vercel will provide a domain like `your-project.vercel.app`
+
+The advantages of Vercel deployment are simplicity, automatic updates, and built-in HTTPS.
+
+#### Method 3: Using Wrangler CLI
 
 If you're comfortable with command-line tools, you can use the Wrangler CLI for deployment.
 
@@ -82,20 +98,16 @@ If you're comfortable with command-line tools, you can use the Wrangler CLI for 
    ```bash
    npm install
    ```
-4. Log in to Cloudflare:
+4. Deploy the Worker:
    ```bash
-   npx wrangler login
+   npx wrangler deploy
    ```
-5. Deploy the Worker:
-   ```bash
-   npm run deploy
-   ```
-6. Set your Secret Token:
+5. Set your Secret Token:
    ```bash
    npx wrangler secret put SECRET_TOKEN
    ```
 
-#### Method 3: Manual Deployment via Cloudflare Dashboard
+#### Method 4: Manual Deployment via Cloudflare Dashboard
 
 If you prefer not to use GitHub or command-line tools, you can create the Worker directly in the Cloudflare Dashboard.
 
@@ -105,8 +117,8 @@ If you prefer not to use GitHub or command-line tools, you can create the Worker
 4. Delete the default code and paste the code from this project's `src/worker.js`
 5. Click **Save and Deploy**
 6. Add environment variables in the Worker settings:
-    - `PREFIX` (e.g., `public`)
-    - `SECRET_TOKEN` (must contain uppercase and lowercase letters and numbers, at least 16 characters long)
+   - `PREFIX` (e.g., `public`)
+   - `SECRET_TOKEN` (must contain uppercase and lowercase letters and numbers, at least 16 characters long)
 
 ### 3.1 (Optional) Bind a Custom Domain 🌐
 
@@ -124,7 +136,10 @@ After binding, you can use addresses like `https://your-domain.com/YOUR_PREFIX/i
 
 ### 4. Register Your Telegram Bot
 
-After deploying the Worker, you'll get a URL like `https://your-worker-name.your-subdomain.workers.dev`.
+After deploying the Worker, you'll get a URL like:
+- GitHub integration: `https://your-project-name.username.workers.dev`
+- Vercel deployment: `https://your-project.vercel.app`
+- Wrangler/Dashboard: `https://your-worker-name.your-subdomain.workers.dev`
 
 Now you need to register your Bot:
 
