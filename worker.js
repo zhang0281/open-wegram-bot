@@ -101,6 +101,10 @@ async function handleWebhook(request, ownerUid, botToken) {
             return new Response('OK');
         }
 
+        if ("/start" === message.text) {
+            return new Response('OK');
+        }
+
         const sender = message.from;
         const senderUid = sender.id.toString();
         const senderName = sender.username ? `@${sender.username}` : [sender.first_name, sender.last_name].filter(Boolean).join(' ');
