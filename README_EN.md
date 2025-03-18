@@ -1,5 +1,6 @@
 # Open Wegram Bot - OWB
 ## A Smooth-Operating Two-Way Private Messaging Telegram Bot 🤖 (Zero Cost)
+### *LivegramBot stays alive, the battle will thrive!*
 
 [简体中文](README.md) | English
 

@@ -1,7 +1,8 @@
 # Open Wegram Bot - OWB
 ## 一个让人呼吸顺畅的 Telegram 双向私聊机器人 🤖（零费用）
+### *LivegramBot 不死，战斗不止！*
 
-简体中文 | [English](README_EN.md)
+简体中文 | [English](README_EN.md) 
 
 这是一个基于 Cloudflare Worker / Vercel 的 Telegram 双向私聊机器人，无需服务器、无需数据库、无需自己的域名即可轻松部署。
 
