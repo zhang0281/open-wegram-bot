@@ -20,7 +20,7 @@ jobs:
 
       - name: 'Sync upstream changes'
         id: sync
-        uses: aormsby/Fork-Sync-With-Upstream-action@v3
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
         with:
           upstream_sync_repo: wozulong/open-wegram-bot
           upstream_sync_branch: master
